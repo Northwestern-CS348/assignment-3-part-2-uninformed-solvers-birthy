@@ -23,7 +23,7 @@ class KBTest(unittest.TestCase):
         for play in plays:
             x = play[0]
             while self.lastEndStep < x:
-                solver.solveOneStep()
+                solver.solveOneStep
                 self.lastEndStep += 1
             res.append(solver.gm.getGameState())
         return res

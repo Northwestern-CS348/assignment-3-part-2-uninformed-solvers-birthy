@@ -17,3 +17,58 @@ fact: (pred obj1 obj2)
 rule: ((pred obj1 obj2) (pred obj2 obj3)) -> (pred obj1 obj3)
 
 """
+fact: (at tile2 pos2 pos1)
+fact: (at tile3 pos3 pos1)
+fact: (at tile4 pos3 pos2)
+fact: (at tile5 pos3 pos3)
+fact: (at tile6 pos2 pos3)
+fact: (at tile7 pos1 pos3)
+fact: (at tile8 pos1 pos2)
+fact: (at empty pos2 pos2)
+
+fact: (movable tile2 pos2 pos1 pos2 pos2)
+fact: (movable tile8 pos1 pos2 pos2 pos2)
+fact: (movable tile6 pos2 pos3 pos2 pos2)
+fact: (movable tile4 pos3 pos2 pos2 pos2)
+
+fact: (adjacent tile1 tile8)
+fact: (adjacent tile1 tile2)
+
+fact: (adjacent tile2 tile1)
+fact: (adjacent tile2 tile3)
+fact: (adjacent tile2 empty)
+
+fact: (adjacent tile3 tile2)
+fact: (adjacent tile3 tile4)
+
+fact: (adjacent tile4 tile3)
+fact: (adjacent tile4 empty)
+fact: (adjacent tile4 tile5)
+
+fact: (adjacent empty tile2)
+fact: (adjacent empty tile4)
+fact: (adjacent empty tile6)
+fact: (adjacent empty tile8)
+
+fact: (adjacent tile5 tile6)
+fact: (adjacent tile5 tile4)
+
+fact: (adjacent tile6 tile7)
+fact: (adjacent tile6 empty)
+fact: (adjacent tile6 tile5)
+
+fact: (adjacent tile7 tile8)
+fact: (adjacent tile7 tile6)
+
+fact: (adjacent tile8 empty)
+fact: (adjacent tile8 tile1)
+fact: (adjacent tile8 tile7)
+
+rule: ((at ?tileA ?x pos2)(at ?tileB ?x ?y)) -> (adjacent ?tileA ?tileB)
+rule: ((at ?tileA pos2 ?y)(at ?tileB ?x ?y)) -> (adjacent ?tileA ?tileB)
+rule: ((at ?tileA ?x ?y)(at ?tileB pos2 ?y)) -> (adjacent ?tileA ?tileB)
+rule: ((at ?tileA ?x ?y)(at ?tileB ?x pos2)) -> (adjacent ?tileA ?tileB)
+rule: ((at empty ?x pos2)(at ?tileB ?x ?y)) -> (movable ?tileB ?x ?y ?x pos2)
+rule: ((at empty pos2 ?y)(at ?tileB ?x ?y)) -> (movable ?tileB ?x ?y pos2 ?y)
+rule: ((at empty ?x ?y)(at ?tileB ?x pos2)) -> (movable ?tileB ?x pos2 ?x ?y)
+rule: ((at empty ?x ?y)(at ?tileB pos2 ?y)) -> (movable ?tileB pos2 ?y ?x ?y)
