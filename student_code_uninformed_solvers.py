@@ -89,10 +89,10 @@ class SolverBFS(UninformedSolver):
                         current.children.append(newState)
                         self.queue.put(newState)
                         self.gm.reverseMove(move)
-            print("queue size", self.queue.qsize())
+
             # get next state, see if visited
             nextS = self.queue.get()
-            print("next state=", nextS.state)
+
             toRoot = []
 
             while current.requiredMovable:  # start from new state --> root

@@ -33,7 +33,6 @@ class TowerOfHanoiGame(GameMaster):
         Returns:
             A Tuple of Tuples that represent the game state
         """
-        #numofPegs = len(self.kb.kb_ask(parse_input("fact: (is ?x peg")))
         result = []
         for pegNum in range(1, 4):
             pegStr = "peg" + str(pegNum)
@@ -43,8 +42,6 @@ class TowerOfHanoiGame(GameMaster):
             pegList = []
             if bindingslist:
                 for bindings in bindingslist:
-                    #current = bindings.bindings[0].constant.element[4:]
-                    #if bindings['?x'] in current:
                     diskstr = bindings['?x']
                     pegList.append(int(diskstr[-1]))
             pegList.sort()
@@ -84,26 +81,26 @@ class TowerOfHanoiGame(GameMaster):
 
         # check if endPeg was empty before move
         if len(endPeg_state) == 0:
-            self.kb.kb_retract(parse_input("fact: (empty " + endPeg + ")"))
+            self.kb.kb_retract(parse_input("fact: (empty peg" + endPeg + ")"))
         else:
             # retract top of ending peg
-            self.kb.kb_retract(parse_input("fact: (top disk" + str(endPeg_state[0]) + ' ' + endPeg + ")"))
-        # retract top of starting peg
-        self.kb.kb_retract(parse_input("fact: (top " + disk + ' ' + startPeg + ")"))
-        # retract on starting peg
-        self.kb.kb_retract(parse_input("fact: (on " + disk + ' ' + startPeg + ")"))
-        #assert top of ending peg
-        self.kb.kb_assert(parse_input("fact: (top " + disk + ' ' + endPeg + ")"))
-        #assert on ending peg
-        self.kb.kb_assert(parse_input("fact: (on " + disk + ' ' + endPeg + ")"))
+            self.kb.kb_retract(parse_input("fact: (top disk" + str(endPeg_state[0]) + ' peg' + endPeg + ")"))
+            # retract top of starting peg
+            self.kb.kb_retract(parse_input("fact: (top disk" + disk + ' peg' + startPeg + ")"))
+            # retract on starting peg
+            self.kb.kb_retract(parse_input("fact: (on disk" + disk + ' peg' + startPeg + ")"))
+            #assert top of ending peg
+            self.kb.kb_assert(parse_input("fact: (top disk" + disk + ' peg' + endPeg + ")"))
+            #assert on ending peg
+            self.kb.kb_assert(parse_input("fact: (on disk" + disk + ' peg' + endPeg + ")"))
 
         # check if starting peg is empty
         if len(startPeg_state) > 1:
             # assert new top of starting peg
-            self.kb.kb_assert(parse_input("fact: (top disk" + str(startPeg_state[1]) + ' ' + startPeg + ")"))
+            self.kb.kb_assert(parse_input("fact: (top disk" + str(startPeg_state[1]) + ' peg' + startPeg + ")"))
         else:
             # assert starting peg empty
-            self.kb.kb_assert(parse_input("fact: (empty " + startPeg + ")"))
+            self.kb.kb_assert(parse_input("fact: (empty peg" + startPeg + ")"))
 
     # rule: ((top ?x ?peg1)(empty ?peg2)) -> (movable ?x ?peg1 ?peg2)
     # rule: ((top ?x ?peg1)(top ?y ?peg2)(larger ?y ?x)) -> (movable ?x ?peg1 ?peg2)
@@ -156,24 +153,26 @@ class Puzzle8Game(GameMaster):
         # peg1list = []
         # peg2list = []
         # peg3list = []
-        game_map = {}
         for y in range(1, 4):
             temp = []
             for x in range(1, 4):
-                ask = "fact: (loc ?tile pos" + str(x) + " pos" + str(y) + ')'
+                ask = "fact: (at ?tile pos" + str(x) + " pos" + str(y) + ')'
                 bindings = self.kb.kb_ask(parse_input(ask))
-                if bindings:
-                    for binding in bindings:
-                        if binding["?tile"] not in game_map:
-                            if binding["?tile"] == "empty":
-                                game_map[binding["?tile"]] == -1
-                            else:
-                                game_map[binding["?tile"]] == int(binding["?tile"][-1])
-                        temp.append(game_map[bindings["?tile"]])
+                answers = bindings.list_of_bindings[0]
+                answer = answers[0].bindings[0].constant.element
+                if answer == "empty":
+                    temp.append(-1)
             result.append(tuple(temp))
         return tuple(result)
-
-
+    #
+    # rule: ((at ?tileA ?x pos2)(at ?tileB ?x ?y)) -> (adjacent ?tileA ?tileB)
+    # rule: ((at ?tileA pos2 ?y)(at ?tileB ?x ?y)) -> (adjacent ?tileA ?tileB)
+    # rule: ((at ?tileA ?x ?y)(at ?tileB pos2 ?y)) -> (adjacent ?tileA ?tileB)
+    # rule: ((at ?tileA ?x ?y)(at ?tileB ?x pos2)) -> (adjacent ?tileA ?tileB)
+    # rule: ((at empty ?x pos2)(at ?tileB ?x ?y)) -> (movable ?tileB ?x ?y ?x pos2)
+    # rule: ((at empty pos2 ?y)(at ?tileB ?x ?y)) -> (movable ?tileB ?x ?y pos2 ?y)
+    # rule: ((at empty ?x ?y)(at ?tileB ?x pos2)) -> (movable ?tileB ?x pos2 ?x ?y)
+    # rule: ((at empty ?x ?y)(at ?tileB pos2 ?y)) -> (movable ?tileB pos2 ?y ?x ?y)
 
     def makeMove(self, movable_statement):
         """
